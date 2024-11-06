@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import './App.scss';
 import { peopleFromServer } from './data/people';
-import { DropdownMenu } from './components/DropdawnMenu/DropdawnMenu';
+import { DropdownMenu } from './components/DropdownMenu/DropdownMenu';
 import classNames from 'classnames';
 import { Person } from './types/Person';
 
@@ -13,10 +13,6 @@ export const App: React.FC = () => {
   const timerId = useRef(0);
   const field = useRef<HTMLInputElement>(null);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-
-  const checkFocus = useCallback(() => {
-    setIsFocused(field.current === document.activeElement);
-  }, []);
 
   const saveQuery = (newQuery: string) => {
     setQuery(newQuery);
@@ -36,7 +32,7 @@ export const App: React.FC = () => {
     return people.filter(person =>
       person.name.toLowerCase().includes(normalizedQuery),
     );
-  }, [normalizedQuery]);
+  }, [normalizedQuery, people]);
 
   function onSelected(person: Person) {
     setSelectedPerson(person);
@@ -61,13 +57,17 @@ export const App: React.FC = () => {
               data-cy="search-input"
               value={query}
               ref={field}
-              onFocus={checkFocus}
+              onFocus={() => setIsFocused(true)}
               onChange={e => saveQuery(e.target.value)}
             />
           </div>
 
           {filteredPeople.length > 0 && (
-            <DropdownMenu people={filteredPeople} onSelected={onSelected} />
+            <DropdownMenu
+              people={filteredPeople}
+              onSelected={onSelected}
+              onFocus={isFocus => setIsFocused(isFocus)}
+            />
           )}
         </div>
 
